@@ -1,0 +1,36 @@
+name: 🧨 Deploy PR Review
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  FLY_REGION: fra
+  FLY_ORG: forge-42
+
+jobs:
+  deploy_pr_review:
+    name: Deploy PR Review
+    runs-on: ubuntu-latest
+
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+
+    environment:
+      name: pr-review
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy PR app to Fly.io
+        id: deploy
+        uses: superfly/fly-pr-review-apps@1.2.1
+        with:
+          name: f42demo-my-remix-app-pr${{ github.event.number }}
