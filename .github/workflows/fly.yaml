@@ -21,7 +21,6 @@ jobs:
 
     environment:
       name: production
-      url: https://forge42.dev
 
     steps:
       - uses: actions/checkout@v4
